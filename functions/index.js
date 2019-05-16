@@ -5,12 +5,11 @@ admin.initializeApp(functions.config().firebase);
 
 exports.pushNotification = functions.database
   .ref('/messages/{pushId}')
-  .onCreate((change, context) => {
+  .onCreate((snapshot, context) => {
     console.log('push notification event triggered');
 
-    let valueObject = change.after.val();
-
-    let pushId = context.params.pushId;
+    let valueObject = snapshot.val();
+	
 
     const payload = {
       notification: {
@@ -33,7 +32,7 @@ exports.pushNotification = functions.database
       .messaging()
       .sendToTopic('reminder', payload, options)
       .then(result => {
-        let notification = admin.database().ref('messages/' + pushId);
+        let notification = snapshot.ref;
         notification
           .remove()
           .then(function() {
